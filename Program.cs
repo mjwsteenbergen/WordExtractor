@@ -11,6 +11,23 @@ namespace WordExtractor
     {
         static async Task Main(bool collect, bool wrangle, string infer, string count)
         {
+            Dictionary<string, string> webster;
+            try
+            {
+                webster = await new Memory
+                {
+                    Application = "WordCount"
+                }.Read<Dictionary<string, string>>("webster.json");
+            }
+            catch (System.Exception)
+            {
+                Console.WriteLine("Webster dictionary not found. Downloading...");
+                webster = await new Memory
+                {
+                    Application = "WordCount"
+                }.Read("webster.json", await new Webster().Download());
+            }
+
             if(collect) {
                 DataCollector dataCollector = new DataCollector();
                 var dict = await dataCollector.Scrape();
@@ -20,7 +37,7 @@ namespace WordExtractor
                     Application = "WordCount"
                 }.Write("all-words.json", dict);
 
-                dict.Print();
+                dict.Count.Print();
             }
 
             if(wrangle) {
@@ -29,18 +46,8 @@ namespace WordExtractor
                     Application = "WordCount"
                 }.Read<Dictionary<string, int>>("all-words.json");
 
-                List<string> goodbye = new List<string>();
 
-                foreach(var kv in dict) {
-                    if(kv.Value < 20) {
-                        goodbye.Add(kv.Key);
-                    }
-                }
-
-                foreach (var key in goodbye)
-                {
-                    dict.Remove(key);
-                }
+                Wrangle.Wrangler(dict, webster);
 
                 await new Memory
                 {
@@ -58,7 +65,7 @@ namespace WordExtractor
                     Application = "WordCount"
                 }.Read<Dictionary<string, int>>("wrangle-words.json");
 
-                var best = await new WordInferer(dict).Solve(infer);
+                var best = new WordInferer(dict).Solve(infer);
 
                 Console.WriteLine($"\"{best.text}\" had {best.score}");
             }

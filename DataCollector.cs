@@ -43,6 +43,8 @@ namespace WordExtractor
                 urls.RemoveAt(0);
             }
 
+            await Task.WhenAll(tasks.ToArray());
+
             return wordCount;
         }
 
@@ -87,7 +89,7 @@ namespace WordExtractor
                     if(lastWord >= i) {
                         continue;
                     }
-                    Increment(nextWord);
+                    Increment(nextWord.Trim());
                     lastWord = i + 1;
                     nextWord = "";
                     continue;
@@ -104,7 +106,7 @@ namespace WordExtractor
                     }
                 }
 
-                if(forbiddenChar.Contains(text[i]) || char.IsDigit(text[i]) || char.IsPunctuation(text[i])) {
+                if(forbiddenChar.Contains(text[i]) || char.IsDigit(text[i]) || char.IsPunctuation(text[i]) || text[i] == '^' || char.IsSeparator(text[i])) {
                     continue;
                 }
 
