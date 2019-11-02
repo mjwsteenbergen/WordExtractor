@@ -21,7 +21,7 @@ namespace WordExtractor
 
         public async Task<Dictionary<string, int>> Scrape()
         {
-            await Task.WhenAll(
+            var list = await Task.WhenAll(
                 Scrape("https://en.wikipedia.org/wiki/Category:Computer_programming"),
                 Scrape("https://en.wikipedia.org/wiki/Category:Software_development_philosophies"),
                 Scrape("https://en.wikipedia.org/wiki/Category:Software_release"),
@@ -29,23 +29,33 @@ namespace WordExtractor
                 Scrape("https://en.wikipedia.org/wiki/Category:Software_development"),
                 Scrape("https://en.wikipedia.org/wiki/Category:Software_development_process"),
                 Scrape("https://en.wikipedia.org/w/index.php?title=Special:LongPages&limit=500&offset=0"));
+
+            var urls = list.SelectMany(i => i).ToList();
+
+            var tasks = urls.Take(10).Select(i => ScrapeArticle(i)).ToList();
+            urls.RemoveRange(0, 10);
+
+            while(urls.Count > 0)
+            {
+                int index = Task.WaitAny(tasks.ToArray());
+                tasks.RemoveAt(index);
+                tasks.Add(ScrapeArticle(urls.ElementAt(0)));
+                urls.RemoveAt(0);
+            }
+
             return wordCount;
         }
 
 
-        public async Task<Dictionary<string, int>> Scrape(string url) {
+        public async Task<IEnumerable<string>> Scrape(string url) {
             HtmlWeb web = new HtmlWeb();
 
             var htmlDoc = await web.LoadFromWebAsync(url);
 
             var tasks2 = htmlDoc.DocumentNode.Descendants("a").Select(i => i.Attributes.FirstOrDefault(j => j.Name == "href")).Where(i => i != null).Select(i => i.Value);
-            var tasks  = tasks2.Where(i => i.StartsWith("/wiki/")).Where(i => !i.ToLower().Contains("list_of")).Select(i => ScrapeArticle("https://en.wikipedia.org" + i));
+            var websites  = tasks2.Where(i => i.StartsWith("/wiki/")).Where(i => !i.ToLower().Contains("list_of")).Select(i => "https://en.wikipedia.org" + i);
 
-            tasks.Count().Print();
-
-            await Task.WhenAll(tasks.ToArray());
-
-            return wordCount;
+            return websites;
         }
 
         public async Task ScrapeArticle(string url) {
