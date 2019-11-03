@@ -6,10 +6,10 @@ namespace WordExtractor
 {
     class Wrangle
     {
-        public static void Wrangler(Dictionary<string, int> dict, Dictionary<string, string> webster) {
+        public static void Wrangler(Dictionary<string, int> dict) {
 
             List<string> goodbye = new List<string>();
-            List<string> webWords = webster.Keys.ToList();
+            List<string> twoWords = new List<string> { "of", "in", "to", "on", "is", "by", "as", "at", "an", "it", "be", "or", "us", "he", "no", "up", "so", "if", "do", "my", "go", "me", "am" };
 
             foreach (var kv in dict)
             {
@@ -18,10 +18,9 @@ namespace WordExtractor
                     goodbye.Add(kv.Key);
                 }
 
-                // if (!webWords.Contains(kv.Key))
-                // {
-                    // goodbye.Add(kv.Key);
-                // }
+                if (kv.Key.Length == 2 && !twoWords.Contains(kv.Key)) {
+                    goodbye.Add(kv.Key);
+                }
             }
 
             foreach (var key in goodbye)

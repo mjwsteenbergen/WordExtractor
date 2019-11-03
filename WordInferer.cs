@@ -10,6 +10,8 @@ namespace WordExtractor
     {
         public Dictionary<string, int> Dictionary { get; }
 
+        private static readonly int NOT_FOUND_SCORE = int.MinValue / 10;
+
         private ConcurrentDictionary<string, (Int64 score, string best)> scorer;
         public WordInferer(Dictionary<string, int> dictionary)
         {
@@ -17,8 +19,19 @@ namespace WordExtractor
             Dictionary = dictionary;
         }
 
-        public (Int64 score, string text) Solve(string text)
+        public async Task<string> Infer(string text) {
+            string res = (await Solve(text)).text;
+
+            return res.Replace(" .", ".").Replace(" ,", ",").Replace(" !", "!");
+        }
+
+        public async Task<(Int64 score, string text)> Solve(string text)
         {
+            if (string.IsNullOrEmpty(text))
+            {
+                return (NOT_FOUND_SCORE, "");
+            }
+
             if(Dictionary.ContainsKey(text.ToLower()))
             {
                 return (Dictionary[text.ToLower()] * (int) Math.Pow(text.Length, 6), text);
@@ -29,7 +42,7 @@ namespace WordExtractor
             }
 
             if(text.Length == 1) {
-                return (int.MinValue / 10, text);
+                return (NOT_FOUND_SCORE, text);
             }
 
             List<(Int64 score, string text)> possibilities = new List<(Int64 score, string text)>();
@@ -38,22 +51,24 @@ namespace WordExtractor
 
             for (int i = 1; i < text.Length; i++)
             {
-                possibilities.Add(Slv(i, text));
+                tasks.Add(Slv(i, text));
             }
 
+            possibilities.Add((NOT_FOUND_SCORE, text));
 
-            // (int score, string text) best = (await Task.WhenAll(tasks.ToArray())).OrderByDescending(i => i.score).First();
-            (Int64 score, string text) best = possibilities.OrderByDescending(i => i.score).First();
+
+            (Int64 score, string text) best = (await Task.WhenAll(tasks.ToArray())).Append((NOT_FOUND_SCORE, text)).OrderByDescending(i => i.score).ThenBy(i => i.text.Length).First();
+            // (Int64 score, string text) best = possibilities.OrderByDescending(i => i.score).ThenBy(i => i.text.Length).First();
 
             scorer.TryAdd(text, best);
 
             return best;
         }
 
-        private (Int64 score, string text) Slv(int i, string text)
+        private async Task<(Int64 score, string text)> Slv(int i, string text)
         {
-            var start = Solve(text.Substring(0, i));
-            var end = Solve(text.Substring(i, text.Length - i));
+            var start = await Solve(text.Substring(0, i));
+            var end = await Solve(text.Substring(i, text.Length - i));
 
             var finalScore = (start.score + end.score);
 
