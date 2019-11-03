@@ -10,7 +10,7 @@ namespace WordExtractor
     {
         public Dictionary<string, int> Dictionary { get; }
 
-        private static readonly int NOT_FOUND_SCORE = int.MinValue / 10;
+        private static readonly int NOT_FOUND_SCORE = 0;
 
         private ConcurrentDictionary<string, (Int64 score, string best)> scorer;
         public WordInferer(Dictionary<string, int> dictionary)

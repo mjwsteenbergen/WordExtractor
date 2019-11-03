@@ -21,16 +21,55 @@ namespace WordExtractor
 
         public async Task<Dictionary<string, int>> Scrape()
         {
-            var list = await Task.WhenAll(
-                Scrape("https://en.wikipedia.org/wiki/Category:Computer_programming"),
-                Scrape("https://en.wikipedia.org/wiki/Category:Software_development_philosophies"),
-                Scrape("https://en.wikipedia.org/wiki/Category:Software_release"),
-                Scrape("https://en.wikipedia.org/wiki/Category:Web_development"),
-                Scrape("https://en.wikipedia.org/wiki/Category:Software_development"),
-                Scrape("https://en.wikipedia.org/wiki/Category:Software_development_process"),
-                Scrape("https://en.wikipedia.org/w/index.php?title=Special:LongPages&limit=500&offset=0"));
 
-            var urls = list.SelectMany(i => i).ToList();
+            var categories = new List<string> {
+                "https://en.wikipedia.org/wiki/Category:Computer_programming",
+                "https://en.wikipedia.org/wiki/Category:Software_development_philosophies",
+                "https://en.wikipedia.org/wiki/Category:Software_release",
+                "https://en.wikipedia.org/wiki/Category:Web_development",
+                "https://en.wikipedia.org/wiki/Category:Software_development",
+                "https://en.wikipedia.org/wiki/Category:Software_development_process",
+                "https://en.wikipedia.org/wiki/Category:Software_testing",
+                "https://en.wikipedia.org/wiki/Category:Tests",
+            };
+            var seenCats = categories;
+
+            var urls = new List<string>();
+
+            var scrapingTasks = categories.Select(i => Scrape(i)).ToList();
+            categories = new List<string> { "https://en.wikipedia.org/w/index.php?title=Special:LongPages&limit=500&offset=0" };
+
+            while (categories.Count > 0)
+            {
+                while(categories.Count > 0 && seenCats.Contains(categories.First())) 
+                {
+                    categories.RemoveAt(0);
+                }
+
+                var task = await Task.WhenAny(scrapingTasks.ToArray());
+                scrapingTasks.Remove(task);
+
+                var result = task.Result;
+
+                urls.AddRange(result.articles);
+                categories.AddRange(result.subCategories);
+                Console.WriteLine($"New categories: {result.subCategories.Count} \t Urls: {urls.Count} ");
+
+                seenCats.Add(categories.ElementAt(0));
+                scrapingTasks.Add(Scrape(categories.ElementAt(0)));
+                categories.RemoveAt(0);
+
+                if(urls.Count > 20000) {
+                    break;
+                }
+
+            }
+
+            await Task.WhenAll(scrapingTasks.ToArray());
+
+            Console.WriteLine($"Scraping {urls.Count} of articles");
+
+            urls = urls.Distinct().ToList();
 
             var tasks = urls.Take(10).Select(i => ScrapeArticle(i)).ToList();
             urls.RemoveRange(0, 10);
@@ -49,15 +88,17 @@ namespace WordExtractor
         }
 
 
-        public async Task<IEnumerable<string>> Scrape(string url) {
+        public async Task<(IEnumerable<string> articles, List<string> subCategories)> Scrape(string url) {
             HtmlWeb web = new HtmlWeb();
 
             var htmlDoc = await web.LoadFromWebAsync(url);
 
-            var tasks2 = htmlDoc.DocumentNode.Descendants("a").Select(i => i.Attributes.FirstOrDefault(j => j.Name == "href")).Where(i => i != null).Select(i => i.Value);
-            var websites  = tasks2.Where(i => i.StartsWith("/wiki/")).Where(i => !i.ToLower().Contains("list_of")).Select(i => "https://en.wikipedia.org" + i);
+            var tasks2 = htmlDoc.DocumentNode.Descendants("a").Select(i => i.Attributes.FirstOrDefault(j => j.Name == "href")).Where(i => i != null).Select(i => i.Value).ToList();
+            var websites  = tasks2.Where(i => i.StartsWith("/wiki/")).Where(i => !i.ToLower().Contains("/wiki/category:")).Where(i => !i.ToLower().Contains("list_of")).Select(i => "https://en.wikipedia.org" + i).ToList();
+            var subCategories = tasks2.Where(i => i.StartsWith("/wiki/Category:")).Select(i => "https://en.wikipedia.org" + i).ToList();
 
-            return websites;
+
+            return (websites, subCategories);
         }
 
         public async Task ScrapeArticle(string url) {
@@ -79,8 +120,7 @@ namespace WordExtractor
             var forbiddenChar = new List<char> { };
 
             int lastWord = 0;
-            text.Length.Print();
-
+            int numberOfWords = 0;
             string nextWord = "";
 
             for (int i = 0; i < text.Length; i++)
@@ -90,6 +130,7 @@ namespace WordExtractor
                         continue;
                     }
                     Increment(nextWord.Trim());
+                    numberOfWords++;
                     lastWord = i + 1;
                     nextWord = "";
                     continue;
@@ -112,6 +153,7 @@ namespace WordExtractor
 
                 nextWord += text[i];
             }
+            Console.WriteLine($"Found {numberOfWords}");
         }
 
         private void Increment(string text)

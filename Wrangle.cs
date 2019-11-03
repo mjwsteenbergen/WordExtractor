@@ -11,15 +11,17 @@ namespace WordExtractor
             List<string> goodbye = new List<string>();
             List<string> twoWords = new List<string> { "of", "in", "to", "on", "is", "by", "as", "at", "an", "it", "be", "or", "us", "he", "no", "up", "so", "if", "do", "my", "go", "me", "am" };
 
-            foreach (var kv in dict)
+            foreach (var key in dict.Keys.ToList())
             {
-                if (kv.Value < 20)
-                {
-                    goodbye.Add(kv.Key);
-                }
+                dict[key] = (int) Math.Log10(dict[key]);
 
-                if (kv.Key.Length == 2 && !twoWords.Contains(kv.Key)) {
-                    goodbye.Add(kv.Key);
+                // if (dict[key] < 20)
+                // {
+                    // goodbye.Add(key);
+                // }
+
+                if (key.Length == 2 && !twoWords.Contains(key)) {
+                    goodbye.Add(key);
                 }
             }
 
