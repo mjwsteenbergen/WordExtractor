@@ -2,10 +2,15 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.0</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>botsay</ToolCommandName>
+    <ToolCommandName>wordextract</ToolCommandName>
+    <PackageProjectUrl>https://github.com/mjwsteenbergen/WordExtractor/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mjwsteenbergen/WordExtractor/.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>Extracts words from strings without spaces</Description>
+    <Authors>Martijn Steenbergen</Authors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +19,7 @@
     <PackageReference Include="System.CommandLine.DragonFruit" Version="0.3.0-alpha.19405.1" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="System.Text.Json" Version="4.7.0-preview3.19551.4" />
   </ItemGroup>
 
