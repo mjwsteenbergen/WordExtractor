@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>wordextract</ToolCommandName>
@@ -17,10 +17,6 @@
     <PackageReference Include="ApiLibs" Version="1.43.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.16" />
     <PackageReference Include="System.CommandLine.DragonFruit" Version="0.3.0-alpha.19405.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="System.Text.Json" Version="4.7.0-preview3.19551.4" />
   </ItemGroup>
-
 </Project>
