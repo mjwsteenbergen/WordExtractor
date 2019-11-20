@@ -19,10 +19,10 @@ namespace WordExtractor
             wordCount = new Dictionary<string, int>();
         }
 
-        public async Task<Dictionary<string, int>> Scrape()
+        public async Task<Dictionary<string, int>> Scrape(List<string> categories = null)
         {
 
-            var categories = new List<string> {
+            categories ??= new List<string> {
                 "https://en.wikipedia.org/wiki/Category:Computer_programming",
                 "https://en.wikipedia.org/wiki/Category:Software_development_philosophies",
                 "https://en.wikipedia.org/wiki/Category:Software_release",
@@ -32,6 +32,7 @@ namespace WordExtractor
                 "https://en.wikipedia.org/wiki/Category:Software_testing",
                 "https://en.wikipedia.org/wiki/Category:Tests",
             };
+            
             var seenCats = categories;
 
             var urls = new List<string>();

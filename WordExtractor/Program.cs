@@ -65,9 +65,6 @@ namespace WordExtractor
                     Console.WriteLine($"\"{count}\" is not present in the dictionary");
                 }
             }
-            
-
-            // await new DataCollector().ScrapeArticle("https://nl.wikipedia.org/wiki/Alphense_hefbrug");
         }
     }
 

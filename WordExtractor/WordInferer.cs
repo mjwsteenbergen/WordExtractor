@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace WordExtractor
@@ -10,7 +11,7 @@ namespace WordExtractor
     {
         public Dictionary<string, int> Dictionary { get; }
 
-        private static readonly int NOT_FOUND_SCORE = 0;
+        private static readonly int NOT_FOUND_SCORE = -100;
 
         private ConcurrentDictionary<string, (Int64 score, string best)> scorer;
         public WordInferer(Dictionary<string, int> dictionary)
@@ -22,7 +23,7 @@ namespace WordExtractor
         public async Task<string> Infer(string text) {
             string res = (await Solve(text)).text;
 
-            return res.Replace(" .", ".").Replace(" ,", ",").Replace(" !", "!");
+            return res.Replace(" .", ".").Replace(" ,", ",").Replace(" !", "!").Replace("( ", "(").Replace(" )", ")").Replace(" - ", "-").Replace(" : ", ": ").Replace(" : ", ": ").Replace("“ ", "“").Replace(" ”","”");
         }
 
         public async Task<(Int64 score, string text)> Solve(string text)
@@ -34,7 +35,11 @@ namespace WordExtractor
 
             if(Dictionary.ContainsKey(text.ToLower()))
             {
-                return (Dictionary[text.ToLower()] * (int) Math.Pow(text.Length, 6), text);
+                return (Dictionary[text.ToLower()] * (int) Math.Pow(text.Length, 2), text);
+            }
+
+            if(Regex.IsMatch(text, @"(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)")) {
+                return (2, text);
             }
 
             if(scorer.ContainsKey(text)) {
@@ -42,6 +47,10 @@ namespace WordExtractor
             }
 
             if(text.Length == 1) {
+                if(char.IsPunctuation(text[0])) {
+                    return (0, text);
+                }
+
                 return (NOT_FOUND_SCORE, text);
             }
 
