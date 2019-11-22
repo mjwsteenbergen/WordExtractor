@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace WordExtractor
 {
-    class Wrangle
+    public class Wrangle
     {
         public static void Wrangler(Dictionary<string, int> dict) {
 

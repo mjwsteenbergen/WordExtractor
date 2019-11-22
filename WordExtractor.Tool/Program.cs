@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using ApiLibs.General;
 
-namespace WordExtractor
+namespace WordExtractor.Tool
 {
     class Program
     {

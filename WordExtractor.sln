@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordExtractor", "WordExtrac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordExtractorTest", "WordExtractorTest\WordExtractorTest.csproj", "{5C3982A0-1EC4-40B0-AB2A-D1096ABC70A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordExtractor.Tool", "WordExtractor.Tool\WordExtractor.Tool.csproj", "{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{5C3982A0-1EC4-40B0-AB2A-D1096ABC70A4}.Release|x64.Build.0 = Release|Any CPU
 		{5C3982A0-1EC4-40B0-AB2A-D1096ABC70A4}.Release|x86.ActiveCfg = Release|Any CPU
 		{5C3982A0-1EC4-40B0-AB2A-D1096ABC70A4}.Release|x86.Build.0 = Release|Any CPU
+		{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}.Debug|x64.Build.0 = Debug|Any CPU
+		{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}.Debug|x86.Build.0 = Debug|Any CPU
+		{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}.Release|x64.ActiveCfg = Release|Any CPU
+		{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}.Release|x64.Build.0 = Release|Any CPU
+		{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}.Release|x86.ActiveCfg = Release|Any CPU
+		{F81C23B1-9909-4BED-A975-C71AA2D1F7B3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
